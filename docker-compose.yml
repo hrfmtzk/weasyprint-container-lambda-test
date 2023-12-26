@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  function:
+    build: .
+    ports:
+      - 9000:8080
+    environment:
+      - POWERTOOLS_LOG_LEVEL=DEBUG
+      - POWERTOOLS_SERVICE_NAME=WeasyPrint-Test
+    volumes:
+      - ./volume:/volume
