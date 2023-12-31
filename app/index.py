@@ -1,17 +1,29 @@
+import sentry_sdk
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.event_handler import (
     LambdaFunctionUrlResolver,
     Response,
+    content_types,
 )
 from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.utilities.typing import LambdaContext
 from jinja2 import Template
+from sentry_sdk import capture_exception
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 from weasyprint import HTML
 
 logger = Logger()
 tracer = Tracer()
 
 app = LambdaFunctionUrlResolver()
+
+
+sentry_sdk.init(
+    integrations=[
+        AwsLambdaIntegration(),
+    ],
+    traces_sample_rate=1.0,
+)
 
 
 class Receipt:
@@ -53,6 +65,21 @@ def get_pdf() -> Response:
                     'filename="example.pdf"',
                 ]
             ),
+        },
+    )
+
+
+@app.exception_handler(Exception)
+def unhandled_exception(ex: Exception) -> Response:
+    logger.error(ex)
+    capture_exception(ex)
+
+    return Response(
+        status_code=500,
+        content_type=content_types.APPLICATION_JSON,
+        body={
+            "statusCode": 500,
+            "message": "Internal Server Error",
         },
     )
 

@@ -8,6 +8,9 @@ services:
     environment:
       - POWERTOOLS_LOG_LEVEL=DEBUG
       - POWERTOOLS_SERVICE_NAME=WeasyPrint-Test
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_RELEASE=0.0
+      - SENTRY_ENVIRONMENT=local
     volumes:
       - ./volume:/volume
   gateway:
