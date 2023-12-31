@@ -52,7 +52,7 @@ class Receipt:
 
 
 @app.get(".+")
-@tracer.capture_method
+@tracer.capture_method(capture_response=False)
 def get_pdf() -> Response:
     return Response(
         status_code=200,
@@ -87,6 +87,6 @@ def unhandled_exception(ex: Exception) -> Response:
 @logger.inject_lambda_context(
     correlation_id_path=correlation_paths.LAMBDA_FUNCTION_URL,
 )
-@tracer.capture_lambda_handler
+@tracer.capture_lambda_handler(capture_response=False)
 def lambda_handler(event: dict, context: LambdaContext) -> dict:
     return app.resolve(event, context)
